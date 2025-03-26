@@ -20,34 +20,34 @@ The following Airbnb activity is included in this New York dataset:
 
 Listings, including full descriptions and average review score Reviews, including unique id for each reviewer and detailed comments Calendar, including listing id and the price and availability for that day
 
-| Column | **Description** | **Data type** |
-|------------------------|------------------------|------------------------|
-| id | Unique id of each listing | numeric |
-| name | Name of the airbnb listing | text |
-| Host id | Unique id for the host | numeric |
-| host_identity_verified | Whether the identify of the host is verified or not | Categorical |
-| host name | Name of the host | text |
-| neighbourhood group | District where the property is | Categorical |
-| neighbourhood | Area or locality of the property | Categorical |
-| lat | Latitude | numeric |
-| long | Longitude | numeric |
-| country | Country where the property is | Categorical |
-| country code | ISO country code | Categorical |
-| instant_bookable | If the property can be instantly booked or not | Categorical |
-| cancellation_policy | Cancellation policy for the booking | Categorical |
-| room type | Type of room | Categorical |
-| Construction year | Year when the property was constructed | numeric |
-| price | Price per night | numeric |
-| service fee | Additional service fee | numeric |
-| minimum nights | Minimum number of nights required for booking | numeric |
-| number of reviews | Total number of reviews | numeric |
-| last review | Last review date | date |
-| reviews per month | Average number of reviews per month | numeric |
-| review rate number | Rating score based on reviews | numeric |
-| calculated host listings count | Total number of listing managed by the host | numeric |
-| availability 365 | Number of days the property is available for booking throughout the year | numeric |
-| house_rules | Rules defined by the host for their guests | text |
-| license | License number for legal compliance of the listing | text |
+| Column                         | **Description**                                                          | **Data type** |
+|--------------------------------|--------------------------------------------------------------------------|---------------|
+| id                             | Unique id of each listing                                                | numeric       |
+| name                           | Name of the airbnb listing                                               | text          |
+| Host id                        | Unique id for the host                                                   | numeric       |
+| host_identity_verified         | Whether the identify of the host is verified or not                      | Categorical   |
+| host name                      | Name of the host                                                         | text          |
+| neighbourhood group            | District where the property is                                           | Categorical   |
+| neighbourhood                  | Area or locality of the property                                         | Categorical   |
+| lat                            | Latitude                                                                 | numeric       |
+| long                           | Longitude                                                                | numeric       |
+| country                        | Country where the property is                                            | Categorical   |
+| country code                   | ISO country code                                                         | Categorical   |
+| instant_bookable               | If the property can be instantly booked or not                           | Categorical   |
+| cancellation_policy            | Cancellation policy for the booking                                      | Categorical   |
+| room type                      | Type of room                                                             | Categorical   |
+| Construction year              | Year when the property was constructed                                   | numeric       |
+| price                          | Price per night                                                          | numeric       |
+| service fee                    | Additional service fee                                                   | numeric       |
+| minimum nights                 | Minimum number of nights required for booking                            | numeric       |
+| number of reviews              | Total number of reviews                                                  | numeric       |
+| last review                    | Last review date                                                         | date          |
+| reviews per month              | Average number of reviews per month                                      | numeric       |
+| review rate number             | Rating score based on reviews                                            | numeric       |
+| calculated host listings count | Total number of listing managed by the host                              | numeric       |
+| availability 365               | Number of days the property is available for booking throughout the year | numeric       |
+| house_rules                    | Rules defined by the host for their guests                               | text          |
+| license                        | License number for legal compliance of the listing                       | text          |
 
 ## **Steps**
 
@@ -213,209 +213,4 @@ data %>%
 
 ### STEP 5 - DATA VISUALIZATION - QUESTIONS
 
-#### QS1 - Let a gt plot summary table for all the numeric columns to see the summary
-
-```{r, echo=FALSE}
-
-data %>%
-  select(price, service.fee, minimum.nights, number.of.reviews,
-         review.rate.number, reviews.per.month,
-         calculated.host.listings.count, availability.365) %>%
-  drop_na() %>%  # Drop only for visualization
-  gt_plt_summary()
-
-## if we drop all nas, this is how the distribution looks like
-```
-
-#### QS 2 - How does the average service fee vary by room type?
-
-```{r, echo=FALSE}
-
-data %>% 
-  select(service.fee, room.type) %>% 
-  filter(!is.na(service.fee)) %>% 
-  group_by(room.type) %>% 
-  summarise(avg_fee = round(mean(service.fee, na.rm = TRUE), 2)) %>% 
-  gt() 
-
-```
-
-#### QS 3 - What is the distribution of listing prices?
-
-```{r, echo=FALSE}
-
-# lets see what the date range looks like to decide a suitable bin width
-range(data$Construction.year, na.rm = TRUE)
-
-data %>% 
-  ggplot(aes(Construction.year)) +
-  geom_histogram(binwidth = 1, fill = 'steelblue', color = "black") +
-  theme_bw() + 
-  labs(x = 'Construction years',
-       y = "Count",
-       title = "Histogram for years when the property was constructed")
-```
-
-#### QS 4 - How many listings exist for each neighbourhood group?
-
-```{r, echo=FALSE}
-
-data %>% 
-  ggplot(aes(neighbourhood.group))+
-  geom_bar(fill = "pink") +
-  geom_text(stat = "count", aes(label = after_stat(count)), vjust = -0.5, size = 3) +  
-  theme_classic() +
-  labs(x = "Neighbourhood Group",
-       y = "Count",
-       title = "Listings exist for each neighbourhood group")
-```
-
-#### QS 5 - How do service fees vary across different room types?
-
-```{r, echo=FALSE}
-
-data %>% 
-  filter(!is.na(service.fee)) %>%  # Remove NAs
-  ggplot(aes(x = service.fee)) +
-  geom_area(stat = "density", fill = "steelblue",colour = "blue", alpha = 0.6) +
-  facet_wrap(~room.type)+
-  theme_bw() +
-  labs(title = "Area Plot of Service Fees",
-       x = "Service Fee",
-       y = "Density")
-```
-
-#### QS 6 - What is the distribution of listing prices across different neighborhoods?
-
-```{r, echo=FALSE}
-
-data %>% 
-  filter(!is.na(price))%>% 
-  ggplot(aes(room.type, price)) +
-  geom_boxplot() +
-  coord_flip()+
-  theme_grey() +
-  labs(x = "Price",
-       y = "Room Type",
-       title = "Price according to the Type of Room")
-```
-
-#### QS 7 - Do hosts with more listings charge higher prices?
-
-```{r, echo=FALSE}
-
-data %>% 
-  filter(!is.na(calculated.host.listings.count) & !is.na(price)) %>%
-  ggplot(aes(calculated.host.listings.count, price)) +
-  geom_point(colour = "steelblue") +
-  labs(x = "Listings", 
-       y = "Price", 
-       title = "Scatter Plot of Host Listings vs. Price")
-```
-
-#### QS 8 - How does the price distribution differ across cancellation policy types?
-
-```{r, echo=FALSE}
-
-data %>%
-  filter(!is.na(price) & !is.na(cancellation_policy)) %>%  # Remove missing values
-  ggplot(aes(x = cancellation_policy, y = price, fill = cancellation_policy)) +
-  geom_violin(alpha = 0.6) +  # Violin plot with transparency
-  scale_y_continuous(limits = c(0, 500), oob = scales::squish) +  # Adjust scale to remove extreme outliers
-  theme_minimal() +
-  labs(
-    title = "Price Distribution Across Room Types",
-    x = "Room Type",
-    y = "Price")
-```
-
-#### QS 9 - How has the number of reviews per month changed over time across different room types?
-
-```{r, echo=FALSE}
-
-data %>% 
-  filter(!is.na(last.review) & !is.na(reviews.per.month)) %>% 
-  ggplot(aes(last.review, reviews.per.month)) +
-  geom_point(size = 3) +
-  geom_smooth() + 
-  facet_wrap(~room.type)+
-  theme_bw() +
-  labs(title = "Line Graph for reviews based on last review year")
-```
-
-#### QS 10 - How do verified vs. unverified hosts vary across boroughs?
-
-```{r, echo=FALSE}
-
-data %>% 
-  filter(!is.na(host_identity_verified) & !is.na(neighbourhood.group)) %>% 
-  ggplot(aes(x = neighbourhood.group, fill = host_identity_verified)) +
-  geom_bar(position = "fill") +  # Use "stack" for absolute counts, "fill" for proportions
-  theme_minimal() +
-  labs(title = "Proportion of Verified vs. Unverified Hosts Across Boroughs",
-       x = "Borough",
-       y = "Proportion",
-       fill = "Host Verification Status")
-```
-
-#### QS 11 - How does the average number of reviews per month vary across different neighborhood groups?
-
-```{r, echo=FALSE}
-
-# lets start by fixing the names of 2 mis spelled names
-data %>%
-  mutate(neighbourhood.group = case_when(
-    neighbourhood.group == "manhatan" ~ "Manhattan",
-    neighbourhood.group == "Brooklyn" ~ "brookln",
-    TRUE ~ neighbourhood.group )) %>% 
-  group_by(neighbourhood.group) %>% 
-  summarise(avg_review_per_month = round(mean(reviews.per.month, na.rm = T),2)) %>% 
-  gt() 
-```
-
-#### QS 12 - How do average price and service fees vary across different neighborhoods in the United States, and are there any geographical patterns visible on the map?
-
-```{r, echo=FALSE}
-
-# Aggregate data
-map_data <- data %>%
-  filter(country == "United States" & !is.na(neighbourhood)) %>%
-  group_by(neighbourhood) %>% 
-  summarise(
-    avg_price = round(mean(price, na.rm = TRUE), 2),
-    avg_service_fee = round(mean(service.fee, na.rm = TRUE), 2),
-    lat = mean(lat, na.rm = TRUE),
-    lon = mean(long, na.rm = TRUE)
-  ) %>%
-  filter(!is.na(lat) & !is.na(lon))  # Ensure valid coordinates
-head(map_data)
-
-# this will show how the table looks like after groupby
-```
-
-```{r, echo=FALSE}
-
-# Create a Leaflet map
-
-leaflet(map_data) %>%
-  addTiles() %>%  # Base map
-  addAwesomeMarkers(
-    ~lon, ~lat,  # Longitude and Latitude
-    icon = awesomeIcons(
-      icon = "map-marker-alt",  # FontAwesome location pin icon
-      library = "fa",  # Use FontAwesome
-      markerColor = "blue"  # Set the marker color to blue
-    ),
-    popup = ~paste0("<b>Neighbourhood: </b>", neighbourhood,
-                    "<br><b>Avg Price: $</b>", avg_price,
-                    "<br><b>Avg Service Fee: $</b>", avg_service_fee)
-  ) %>%
-  fitBounds(
-    lng1 = min(map_data$lon, na.rm = TRUE), 
-    lat1 = min(map_data$lat, na.rm = TRUE), 
-    lng2 = max(map_data$lon, na.rm = TRUE), 
-    lat2 = max(map_data$lat, na.rm = TRUE)
-  )  # Auto-zoom to data bounds
-```
-
-If you like to access the code, you can find this project on my [Github](https://github.com/Siddhi1529/Airbnb-R.git)
+I have solved around 12 questions on this dataset, you can find this project on my [Github](https://github.com/Siddhi1529/Airbnb-R.git)
